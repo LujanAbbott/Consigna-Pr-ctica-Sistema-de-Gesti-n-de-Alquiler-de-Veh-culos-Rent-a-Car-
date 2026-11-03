@@ -1,3 +1,130 @@
-<Solution>
-  <Project Path="ConsoleApp1/ConsoleApp1.csproj" />
-</Solution>
+internal class Program
+{
+    //Sistema de gestión alquiler de vehículos 
+    public class Vehiculo //HERENCIA es la clase padre
+    {
+        //Encapsulamiento: Atributos protegidos con get y set
+        public string Patente { get; set; }
+        public string Marca { get; set; }
+
+        public double Tarifabase { get; set; }
+
+        //Método constructor 
+        public Vehiculo(string patente, string marca, double tarifaBase)
+        {
+            Patente = patente;
+            Marca = marca;
+            Tarifabase = tarifaBase;
+        }
+        public virtual double CalcularTarifa() //Cálculo TarifaBase, Polimorfismo: Se usa virtual para luego añadir cosas distintas a la función 
+        {
+            return Tarifabase;
+        }
+
+    }
+
+    public class Auto : Vehiculo //HERENCIA es la clase hija que deriva de vehículo
+    {
+        public double SeguroColision { get; set; } //Seguro obligatorio de colisión
+        public Auto(string patente, string marca, double tarifabase, double segurocolision) : base(patente, marca, tarifabase)
+        {
+            SeguroColision = segurocolision;
+        }
+        public override double CalcularTarifa()//Polimorfismo: Se usa el override para agregar las cosas distintas a la función de la función padre
+        {
+            {
+                return Tarifabase + SeguroColision;
+            }
+        }
+    }
+
+        public class Camioneta : Vehiculo //HERENCIA es la clase hija que deriva de vehículo
+        {
+            public double Tonelaje { get; set; } //Cantidad de toneladas que soporta la camioneta 
+            public Camioneta(string patente, string marca, double tarifabase, double tonelaje) : base(patente, marca, tarifabase)
+            {
+                Tonelaje = tonelaje;
+            }
+
+            public override double CalcularTarifa() //Polimorfismo: Se usa el override para agregar las cosas distintas a la función de la función padre
+            {
+                return Tarifabase + (Tonelaje * 2000);//2000 el precio por tonelaje 
+            }
+
+        }
+
+        private static void Main(string[] args)
+        {
+            List<Vehiculo> flota = new List<Vehiculo>(); //Lista mixta que puede contener autos y camionetas
+            bool continuar = true;
+            Console.WriteLine("SISTEMA DE GESTIÓN DE ALQUILERES DE VEHÍCULOS");//Menú
+            while (continuar)
+            {
+                Console.WriteLine("\n¿Qué vehículo desea ingresar?");
+
+                Console.WriteLine("1. Auto");
+                Console.WriteLine("2. Camioneta");
+
+                Console.Write("Seleccione una opción (1 o 2): ");
+                string opcion = Console.ReadLine();
+
+                Console.Write("Ingrese la patente: ");
+                string patente = Console.ReadLine();
+
+                Console.Write("Ingrese la marca: ");
+                string marca = Console.ReadLine();
+
+                Console.Write("Ingrese la tarifa base: ");
+                double tarifaBase = double.Parse(Console.ReadLine());
+
+                if (opcion == "1")
+                {
+                    Console.Write("Ingrese el costo del seguro de colisión: ");
+                    double seguro = double.Parse(Console.ReadLine());
+
+                    Auto nuevoAuto = new Auto(patente, marca, tarifaBase, seguro);//Creamos un objeto auto
+                    flota.Add(nuevoAuto);//Metemos el objeto auto dentro de la lista
+                }
+                else if (opcion == "2")
+                {
+                    Console.Write("Ingrese la capacidad en toneladas: ");
+                    double toneladas = double.Parse(Console.ReadLine());
+
+                    Camioneta nuevaCamioneta = new Camioneta(patente, marca, tarifaBase, toneladas);//Creamos un objeto camioneta
+                    flota.Add(nuevaCamioneta);//Añadimos el objeto a la lista
+                }
+                else
+                {
+                    Console.WriteLine("Opción no válida. Ingresae una opción válida.");
+                }
+
+                Console.Write("\n¿Desea ingresar otro vehículo? (s/n): ");
+                string respuesta = Console.ReadLine().ToLower();
+
+                if (respuesta != "s")
+                {
+                    continuar = false;
+                }
+            }
+
+            Console.WriteLine("INFORME DE FLOTA");
+            foreach (Vehiculo v in flota) //Recorremos la lista
+            {
+                string tipo = "Vehículo";
+                if (v is Auto)
+                {
+                    tipo = "Auto";
+                }
+                else if (v is Camioneta)
+                {
+                    tipo = "Camioneta";
+                }
+
+                Console.WriteLine($"Tipo: {tipo} | Patente: {v.Patente} | Marca: {v.Marca} | Costo Neto Final: ${v.CalcularTarifa()}"); //Mostramos los datos
+
+            }
+            Console.WriteLine("==================================================");
+            Console.WriteLine("¡Proceso finalizado! Presione una tecla para salir.");
+            Console.ReadKey();
+        }
+    }
